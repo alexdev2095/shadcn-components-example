@@ -42,6 +42,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import type { Payment } from "@/data/payments.data"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -79,12 +80,14 @@ export function DataTable<TData, TValue>({
         },
     })
 
+    const isDeleteVisible = Object.keys(rowSelection).length > 0;
+
 
     return (
         <div>
             <div className="flex items-center py-4 ml-8 justify-between">
                 <Input
-                    placeholder="Filter emails..."
+                    placeholder="Filter (client name, status, email)"
                     value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
                     onChange={(event) => {
                         setCurrentStatus('all')
@@ -121,6 +124,31 @@ export function DataTable<TData, TValue>({
                         </SelectGroup>
                     </SelectContent>
                 </Select>
+
+                {
+                    isDeleteVisible && (
+                        <Button
+                            className="ml-2"
+                            variant='destructive'
+                            onClick={() => {
+                                // table.getSelectedRowModel().rows.forEach((row) => {
+                                //     console.log(row.original);
+                                // })
+
+                                const ids = table.getSelectedRowModel().rows.map((row) => {
+                                    return (row.original as Payment).id
+                                })
+
+                                console.log(ids);
+                            }}
+                        >
+                            Delete
+                        </Button>
+                    )
+                }
+
+
+
 
                 <DropdownMenu >
                     <DropdownMenuTrigger asChild>
@@ -197,7 +225,7 @@ export function DataTable<TData, TValue>({
                     </TableBody>
                 </Table>
 
-                <div>
+                <div className="flex justify-between items-center space-x-2 py-2 mx-4">
                     <div className="flex-1 text-sm text-muted-foreground  mt-3">
                         {table.getFilteredSelectedRowModel().rows.length} of{" "}
                         {table.getFilteredRowModel().rows.length} row(s) selected.
@@ -221,6 +249,25 @@ export function DataTable<TData, TValue>({
                         </Button>
                     </div>
                 </div>
+
+                <Select
+                    onValueChange={(value) => table.setPageSize(+value)}
+                >
+                    <SelectTrigger className="m-2 w-1/4">
+                        <SelectValue placeholder='10 Rows' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Rows per pages</SelectLabel>
+                            <SelectItem value="10">10</SelectItem>
+                            <SelectItem value="20">20</SelectItem>
+                            <SelectItem value="30">30</SelectItem>
+                            <SelectItem value="50">50</SelectItem>
+                            <SelectItem value="100">100</SelectItem>
+
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
 
             </div>
         </div>

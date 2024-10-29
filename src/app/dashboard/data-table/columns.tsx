@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Payment } from "@/data/payments.data"
-import { ColumnDef, SortDirection } from "@tanstack/react-table"
+import { ColumnDef, FilterFn, Row, SortDirection } from "@tanstack/react-table"
 import { Variants } from "./type"
 
 import {
@@ -31,6 +31,21 @@ const SortedIcon = ({ isSorted }: { isSorted: false | SortDirection }) => {
     return null;
 }
 
+const handlerFilterFn: FilterFn<Payment> = (
+    row: Row<Payment>,
+    columnId: string,
+    filterValue: string,
+    addMeta: (meta: any) => void
+) => {
+    filterValue = filterValue.toLowerCase();
+    const filterParams = filterValue.split(' ');
+
+    const rowValue = `${row.original.email} ${row.original.clientName} ${row.original.status}`.toLowerCase();
+
+    return filterParams.every((part) => rowValue.includes(part));
+
+}
+
 export const columns: ColumnDef<Payment>[] = [
     {
         id: "select",
@@ -55,6 +70,7 @@ export const columns: ColumnDef<Payment>[] = [
         enableHiding: false,
     },
     {
+        filterFn: handlerFilterFn,
         accessorKey: "clientName",
         header: ({ column }) => {
             return (
@@ -69,6 +85,7 @@ export const columns: ColumnDef<Payment>[] = [
         },
     },
     {
+        filterFn: handlerFilterFn,
         accessorKey: "status",
         header: ({ column }) => {
             return (
@@ -76,7 +93,7 @@ export const columns: ColumnDef<Payment>[] = [
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    Client Name
+                    Status
                     <SortedIcon isSorted={column.getIsSorted()} />
                 </Button>
             )
@@ -102,7 +119,7 @@ export const columns: ColumnDef<Payment>[] = [
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
-                        Client Name
+                        Amount
                         <SortedIcon isSorted={column.getIsSorted()} />
                     </Button>
                 </div>
@@ -119,6 +136,7 @@ export const columns: ColumnDef<Payment>[] = [
         },
     },
     {
+        filterFn: handlerFilterFn,
         accessorKey: "email",
         header: ({ column }) => {
             return (
